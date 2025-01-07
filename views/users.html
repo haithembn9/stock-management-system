@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Products</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+    />
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f7fa;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        color: #333;
+      }
+      form {
+        width: 100%;
+        max-width: 400px;
+        background-color: white;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      }
+
+      form input {
+        width: 100%;
+        padding: 10px;
+        margin: 10px 0;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        box-sizing: border-box;
+      }
+
+      form input[type="submit"] {
+        background-color: #007bff;
+        color: white;
+        cursor: pointer;
+      }
+
+      form input[type="submit"]:hover {
+        background-color: #0056b3;
+      }
+
+ 
+      .container {
+        width: 80%;
+        margin: 20px auto;
+        padding: 20px;
+        background-color: white;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        border-radius: 8px;
+      }
+
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 20px 0;
+      }
+
+      table th,
+      table td {
+        padding: 12px;
+        text-align: left;
+        border-bottom: 1px solid #ddd;
+      }
+
+      table th {
+        background-color: #007bff;
+        color: white;
+      }
+
+      table tr:hover {
+        background-color: #f1f1f1;
+      }
+
+
+      .action-buttons a {
+        text-decoration: none;
+        color: white;
+        background-color: #007bff;
+        padding: 5px 10px;
+        border-radius: 5px;
+        margin-right: 5px;
+      }
+
+      .action-buttons a:hover {
+        background-color: #0056b3;
+      }
+    </style>
+  </head>
+  <body>
+    <div>
+      <form
+        action="{{ url_for('add_product') }}"
+        method="post"
+        id="product-form"
+      >
+        <input
+          type="text"
+          name="productname"
+          id="productname"
+          placeholder="Product Name"
+          required
+          autocomplete="off"
+        />
+        <input
+          type="number"
+          name="amount"
+          id="amount"
+          placeholder="Amount"
+          required
+          autocomplete="off"
+          min="0"
+        />
+        <input
+          type="number"
+          name="price"
+          id="price"
+          placeholder="Price"
+          required
+          autocomplete="off"
+          min="0"
+        />
+        <input
+          type="number"
+          id="total_price"
+          placeholder="Total Price"
+          readonly
+        />
+        <input type="hidden" name="product_id" id="product_id" />
+        <input type="submit" value="Add Product" id="submit-btn" />
+      </form>
+    </div>
+
+
+    <div class="container">
+      <h1>Product List</h1>
+      <table>
+        <thead>
+          <tr>
+            <th>Product Name</th>
+            <th>Amount</th>
+            <th>Unit Price</th>
+            <th>Total Price</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for product in products %}
+          <tr id="product_{{ product['id'] }}">
+            <td>{{ product['productname'] }}</td>
+            <td>{{ product['amount'] }}</td>
+            <td>{{ product['price'] }}</td>
+            <td>{{ product['total_price'] }}</td>
+            <td class="action-buttons">
+              <a
+                href="javascript:void(0)"
+                onclick="editProduct({{ product['id'] }}, '{{ product['productname'] }}', {{ product['amount'] }}, {{ product['price'] }})"
+                >Edit</a
+              >
+              <a href="/delete_product/{{ product['id'] }}">Delete</a>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    
+    <script>
+      function editProduct(id, productname, amount, price) {
+        document.getElementById("product-form").action = "/edit_product/" + id;
+        document.getElementById("productname").value = productname;
+        document.getElementById("amount").value = amount;
+        document.getElementById("price").value = price;
+        document.getElementById("product_id").value = id;
+        document.getElementById("submit-btn").value = "Update Product";
+      }
+
+      document
+        .getElementById("amount")
+        .addEventListener("input", calculateTotalPrice);
+      document
+        .getElementById("price")
+        .addEventListener("input", calculateTotalPrice);
+
+      function calculateTotalPrice() {
+        var amount = document.getElementById("amount").value;
+        var price = document.getElementById("price").value;
+
+        if (amount && price) {
+          var totalPrice = amount * price;
+          document.getElementById("total_price").value = totalPrice;
+        } else {
+          document.getElementById("total_price").value = "";
+        }
+      }
+    </script>
+  </body>
+</html>
